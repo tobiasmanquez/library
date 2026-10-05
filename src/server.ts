@@ -8,6 +8,11 @@ const PORT = 3000;
 
 app.use(express.json()); // permite leer JSON del body en POST / PUT / PATCH
 
+app.use((req, res, next) => {
+  console.log(`[${Date()}]: APIs Calling`);
+  next();
+});
+
 // Ruta de prueba: si esto responde, el servidor está levantado.
 app.get("/", (req: Request, res: Response) => {
   res.json({ message: "Library API running", docs: `http://localhost:${PORT}/docs` });
