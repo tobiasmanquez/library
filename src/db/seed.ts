@@ -1,12 +1,29 @@
 // Crea las tablas desde cero y carga datos de ejemplo.
 // Correr con: npm run seed
-// ⚠️ Borra todo lo que hubiera en las tablas authors, books y loans de la base `library`.
+// ⚠️ Borra todo lo que hubiera en las tablas authors, books, loans y users de la base `library`.
 
+import bcrypt from "bcryptjs"; 
 import { sequelize } from "./connection.js";
-import { Author, Book, Loan } from "../models/index.js";
-
+import { Author, Book, Loan, } from "../models/index.js"; 
+import { User } from "../models/users.js";
 async function seed() {
   await sequelize.sync({ force: true });
+
+  const adminPasswordHash = await bcrypt.hash("admin123", 10);
+  const userPasswordHash = await bcrypt.hash("user123", 10);
+
+  await User.bulkCreate([
+    { 
+      email: "admin@library.com", 
+      passwordHash: adminPasswordHash, 
+      role: "admin" 
+    },
+    {
+      email: "lector@library.com", 
+      passwordHash: userPasswordHash, 
+      role: "user"
+    }
+  ]);
 
   const [cortazar, borges, ocampo, bolano] = await Author.bulkCreate([
     { name: "Julio Cortázar", nationality: "Argentina" },
@@ -38,7 +55,7 @@ async function seed() {
   ]);
 
   console.log("✅ Database created and loaded:");
-  console.log(`   ${await Author.count()} authors, ${await Book.count()} books, ${await Loan.count()} loans`);
+  console.log(`   ${await User.count()} users, ${await Author.count()} authors, ${await Book.count()} books, ${await Loan.count()} loans`);
   await sequelize.close();
 }
 
